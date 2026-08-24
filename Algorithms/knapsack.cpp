@@ -1,44 +1,62 @@
 #include<iostream>
+#include<algorithm>
 using namespace std;
 
-void Knapsack(int W, int wt[], int val[], int n) {
-    int w;
-    int K[n + 1][W + 1];
+// Structure to represent an item with profit and weight
+struct Item {
+    int profit;
+    int weight;
+};
 
-    for (int i = 0; i <= n; i++) {
-        for (w = 0; w <= W; w++) {
-            if (i == 0 || w == 0)
-                K[i][w] = 0;
-            else if (wt[i - 1] <= w)
-                K[i][w] = max(val[i - 1] + K[i - 1][w - wt[i - 1]], K[i - 1][w]);
-            else
-                K[i][w] = K[i - 1][w];
+// Comparison function to sort items by profit/weight ratio in descending order
+bool compareItems(Item a, Item b) {
+    double ratio1 = (double)a.profit / (double)a.weight;
+    double ratio2 = (double)b.profit / (double)b.weight;
+    return ratio1 > ratio2;
+}
+
+double fractionalKnapsack(int W, Item arr[], int n) {
+    // 1 & 2. Compute ratio and sort items in decreasing order of ratio
+    sort(arr, arr + n, compareItems);
+
+    // 3. Initialize profit
+    double finalProfit = 0.0;
+
+    // 4. Loop through each item
+    for (int i = 0; i < n; i++) {
+        
+        // If the item can completely fit in the remaining capacity
+        if (arr[i].weight <= W) {
+            finalProfit += arr[i].profit;
+            W -= arr[i].weight;
+        } 
+        // If the item cannot fit completely, take a fraction of it
+        else {
+            double fraction = (double)W / (double)arr[i].weight;
+            finalProfit += arr[i].profit * fraction;
+            break; // The knapsack is now full
         }
     }
 
-    cout << "Maximum value in Knapsack = " << K[n][W] << endl;
+    // 5. Return the total accumulated profit
+    return finalProfit;
 }
 
 int main() {
     int n, W;
-
-    cout << "Enter number of items: ";
+    cout << "Enter the number of items: ";
     cin >> n;
-
-    int val[n], wt[n];
-
-    cout << "Enter values of items: ";
-    for (int i = 0; i < n; i++)
-        cin >> val[i];
-
-    cout << "Enter weights of items: ";
-    for (int i = 0; i < n; i++)
-        cin >> wt[i];
-
-    cout << "Enter maximum weight capacity of knapsack: ";
+    Item arr[n];
+    cout << "Enter the weights of the items: ";
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i].weight;
+    }
+    cout << "Enter the values of the items: ";
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i].profit;
+    }
+    cout << "Enter the maximum weight capacity of the knapsack: ";
     cin >> W;
 
-    Knapsack(W, wt, val, n);
-
-    return 0;
+    cout << "Maximum profit = " << fractionalKnapsack(W, arr, n) << endl;
 }
