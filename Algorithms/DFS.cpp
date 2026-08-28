@@ -9,7 +9,7 @@ void DFS(int u, vector<vector<int>> &adj, vector<bool> &visited)
     visited[u] = true;
 
     // Print current vertex
-    cout << u << " ";
+    cout << u << " "<<"->";
 
     // Visit all adjacent vertices
     for (int v : adj[u])
